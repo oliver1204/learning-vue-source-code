@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<script src="///Users/olifer/Desktop/vue/vue.js"></script>
+</head>
+
+<body>
+  <div id="example">{{msg}}</div>
+  <button @click="updateMessage">click me</button>
+
+  <div>{{messages}}</div>
+
+  <div>{{computedTest}}</div>
+
+  <div>{{watchomputedTest}}</div>
+
+  <div>{{setText}}</div>
+
+
+  <script>
+
+    // Vue.directive('src', {
+    //   update(baseSrc) {
+    //     if (!baseSrc) return
+    //     this.el.src = baseSrc
+    //   },
+    // })
+
+    new Vue({
+      el: 'body',
+
+      data: () => {
+        return {
+          msg: 'not updated',
+          messages: 'test',
+          watchomputedTest: ''
+        };
+      },
+
+      methods: {
+        updateMessage () {
+          this.msg = 'updated'
+          this.$nextTick(function () {
+            this.$set('setText', 2)
+            this.msg = 'updated again'
+          })
+        }
+      },
+
+      computed: {
+        computedTest() {
+          return 'computedTest';
+        }
+      },
+
+      watch: {
+        computedTest: () => {
+          return this.watchomputedTest = 'watchomputedTest';
+        }
+      }
+
+    });
+
+  </script>
+</body>
+</html>
