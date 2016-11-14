@@ -53,12 +53,12 @@
 
   var _Set = E6 set()
 
-  function Cache() {}
+  function Cache() {}                         // 504 - 509 issues 2 vue 的双向链表缓存
 
   var p = Cache.prototype;
-  p.put()
-  p.shift()
-  p.get()
+  p.put()                                     // 524 - 548
+  p.shift()                                   // 556 - 566
+  p.get()                                     // 507 - 603
 
   var cache$1 = new Cache(1000);
 
@@ -315,7 +315,7 @@
 
   function compileSetter() {}
 
-  function parseExpression() {}
+  function parseExpression() {}    // 2967 - 2988
 
   function isSimplePath() {}
 
@@ -330,7 +330,7 @@
 
   function runBatcherQueue() {}
 
-  function pushWatcher() {}    // 3099 - 3112  
+  function pushWatcher() {}    // 3099 - 3112
 
   function Watcher() {}
   Watcher.prototype.get
@@ -666,13 +666,40 @@
 
   function miscMixin() {}
 
-  function dataAPI() {}
+  function dataAPI(Vue) {
+    Vue.prototype.$get        // 8882 - 8899
+    Vue.prototype.$set
+    Vue.prototype.$delete
+    Vue.prototype.$watch
+    Vue.prototype.$eval
+    Vue.prototype.$interpolate
+    Vue.prototype.$log
+  }
 
-  function domAPI() {}
+  function domAPI() {
+    Vue.prototype.$nextTick
+    Vue.prototype.$nextTick
+    Vue.prototype.$nextTick
+    Vue.prototype.$before
+    Vue.prototype.$after
+    Vue.prototype.$remove
+  }
 
-  function eventsAPI() {}
+  function eventsAPI() {
+    Vue.prototype.$on
+    Vue.prototype.$once
+    Vue.prototype.$off
+    Vue.prototype.$emit
+    Vue.prototype.$broadcast
+    Vue.prototype.$dispatch
+  }
 
-  function lifecycleAPI() {}
+  function lifecycleAPI() {
+    Vue.prototype.$mount
+    Vue.prototype.ready()
+    Vue.prototype.$destroy
+    Vue.prototype.$compile
+  }
 
   function Vue() {}
   Vue.prototype._initState

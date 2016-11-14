@@ -3,7 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>无标题文档</title>
-<script src="///Users/olifer/Desktop/vue/vue.js"></script>
+<script src="./vue.js"></script>
+<style scope>
+   * {
+     font-size: 48px;
+   }
+</style>
 </head>
 
 <body>
@@ -35,7 +40,9 @@
         return {
           msg: 'not updated',
           messages: 'test',
-          watchomputedTest: ''
+          watchTest: '',
+          a: 1,
+          b: 2
         };
       },
 
@@ -57,7 +64,7 @@
 
       watch: {
         computedTest: () => {
-          return this.watchomputedTest = 'watchomputedTest';
+          return this.watchTest = 'watchTest';
         }
       }
 
