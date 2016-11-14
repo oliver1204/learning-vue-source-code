@@ -19,7 +19,7 @@
         obj[key] = val;
         return;
       }
-      if (obj._isVue) {
+      if (obj._isVue) {       // 默认 true, a flag to avoid this being observed
         set(obj._data, key, val);
         return;
       }
@@ -568,10 +568,10 @@
     }
 
     function Cache(limit) {
-      this.size = 0;
-      this.limit = limit;
-      this.head = this.tail = undefined;
-      this._keymap = Object.create(null);
+      this.size = 0;                        // 标识当前缓存数组的大小
+      this.limit = limit;                   // 标识缓存数组能达到的最大长度
+      this.head = this.tail = undefined;    // head（最不常用的项），tail（最常用的项）全部初始化为undefined
+      this._keymap = Object.create(null);   // _keymap来存储已有的节点，在判断是否存在时，直接读取属性就行，不用在遍历一遍链表，这样降低了在查找过程中的时间复杂度。
     }
 
     var p = Cache.prototype;
@@ -586,24 +586,25 @@
      * @param {*} value
      * @return {Entry|undefined}
      */
-
+    // 在缓存中加入一个 `key-value` 对象，如果缓存数组已经达到最大值，
+    // 则返回被删除的 `entry`，即 `head`,否则返回 `undefined`
     p.put = function (key, value) {
       var removed;
 
       var entry = this.get(key, true);
-      if (!entry) {
-        if (this.size === this.limit) {
+      if (!entry) {                          // 如果不存在 key 这样属性的缓存对象，才能调用 put 方法
+        if (this.size === this.limit) {      // 如果缓存数组达到上限，则先删除 head 指向的缓存对象
           removed = this.shift();
         }
-        entry = {
+        entry = {                             // 初始化赋值
           key: key
         };
         this._keymap[key] = entry;
-        if (this.tail) {
+        if (this.tail) {                      // 如果存在tail（缓存数组的长度不为0），将tail指向新的 entry
           this.tail.newer = entry;
           entry.older = this.tail;
         } else {
-          this.head = entry;
+          this.head = entry;                  // 如果缓存数组的长度为0，将head指向新的entry
         }
         this.tail = entry;
         this.size++;
@@ -618,15 +619,15 @@
      * cache. Returns the removed entry or undefined if the
      * cache was empty.
      */
-
+    // 在缓存数组中移除最少使用的entry，即head，返回被删除的entry。如果缓存数组为空，则返回undefined
     p.shift = function () {
       var entry = this.head;
       if (entry) {
-        this.head = this.head.newer;
+        this.head = this.head.newer;              // 删除 head ，并改变指向
         this.head.older = undefined;
         entry.newer = entry.older = undefined;
-        this._keymap[entry.key] = undefined;
-        this.size--;
+        this._keymap[entry.key] = undefined;     // 同步更新 _keymap 里面的属性值
+        this.size--;                             // 同步更新 缓存数组的长度
       }
       return entry;
     };
@@ -639,20 +640,22 @@
      * @param {Boolean} returnEntry
      * @return {Entry|*}
      */
-
+    // 将key为传入参数的缓存对象标识为最常使用的entry，即tail，并调整双向链表，返回改变后的tail。
+    // 如果不存在key为传入参数的缓存对象，则返回undefined
     p.get = function (key, returnEntry) {
       var entry = this._keymap[key];
-      if (entry === undefined) return;
-      if (entry === this.tail) {
+      if (entry === undefined) return;   // 如果查找不到含有`key`这个属性的缓存对象
+      if (entry === this.tail) {         // 如果查找到的缓存对象已经是 tail (最近使用过的)
         return returnEntry ? entry : entry.value;
       }
-      // HEAD--------------TAIL
+      // LRU( Least Recently Used )算法
+      // HEAD（最近最少使用的项）--------------TAIL（最近最多使用的项）
       //   <.older   .newer>
       //  <--- add direction --
-      //   A  B  C  <D>  E
-      if (entry.newer) {
-        if (entry === this.head) {
-          this.head = entry.newer;
+      //   A  B  C  <D>  E                // entry 为D
+      if (entry.newer) {                  // 处理 newer 指向
+        if (entry === this.head) {        // 如果查找到的缓存对象是 head (最近最少使用过的)
+          this.head = entry.newer;        // 则将 head 指向原 head 的 newer 所指向的缓存对象
         }
         entry.newer.older = entry.older; // C <-- E.
       }
@@ -663,7 +666,7 @@
       entry.older = this.tail; // D. --> E
       if (this.tail) {
         this.tail.newer = entry; // E. <-- D
-      }
+      }                                          // A  B  C  E  D
       this.tail = entry;
       return returnEntry ? entry : entry.value;
     };
@@ -2220,7 +2223,7 @@
      *
      * @param {Object} obj
      */
-
+    // 递归。。让每个字属性可以observe
     Observer.prototype.walk = function (obj) {
       var keys = Object.keys(obj);
       for (var i = 0, l = keys.length; i < l; i++) {
@@ -2921,8 +2924,10 @@
 
     // keywords that don't make sense inside expressions
     var improperKeywords = 'break,case,class,catch,const,continue,debugger,default,' + 'delete,do,else,export,extends,finally,for,function,if,' + 'import,in,instanceof,let,return,super,switch,throw,try,' + 'var,while,with,yield,enum,await,implements,package,' + 'protected,static,interface,private,public';
+    // 匹配上述任意关键字
     var improperKeywordsRE = new RegExp('^(' + improperKeywords.replace(/,/g, '\\b|') + '\\b)');
 
+    // 任意空白字符
     var wsRE = /\s/g;
     var newlineRE = /\n/g;
     var saveRE = /[\{,]\s*[\w\$_]+\s*:|('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*\$\{|\}(?:[^`\\]|\\.)*`|`(?:[^`\\]|\\.)*`)|new |typeof |void /g;
@@ -3027,6 +3032,8 @@
      * @param {String} body
      * @return {Function|undefined}
      */
+    // scope: 当前方法的执行环境。但部分时候为当前Vue实例，for循环时猜测为当前循环所对应的数据对象(猜测，尚未看for指令的实现)
+    // body，如：scope.a.b(简单表达式)、scope.a + scope.b(复杂表达式)
 
     function makeGetterFn(body) {
       try {
@@ -3070,6 +3077,10 @@
      * @param {String} exp
      * @param {Boolean} needSet
      * @return {Function}
+        res = {
+          exp: exp,
+          get: function() {}
+        }
      */
 
     function parseExpression(exp, needSet) {
@@ -8990,7 +9001,7 @@
        */
 
       Vue.prototype.$get = function (exp, asStatement) {
-        var res = parseExpression(exp);
+        var res = parseExpression(exp);        // 解析表达式，并返回一个包含get方法的对象。
         if (res) {
           if (asStatement) {
             var self = this;
@@ -9625,10 +9636,10 @@
     miscMixin(Vue);
 
     // install instance APIs     安装实例APIS
-    dataAPI(Vue);
-    domAPI(Vue);
-    eventsAPI(Vue);
-    lifecycleAPI(Vue);
+    dataAPI(Vue);    // $get,$set,$delete,$watch,$eval,$interpolate,$log
+    domAPI(Vue);     // $nextTick,$appendTo,$prependT,$before$after,$remove
+    eventsAPI(Vue);  // $on,$once,$off,$emit,$broadcast,$dispatch
+    lifecycleAPI(Vue);  // $mount,ready(),$destroy,$compile
 
     var slot = {
 
