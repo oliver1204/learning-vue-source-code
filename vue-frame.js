@@ -3,7 +3,7 @@
   (global.Vue = factory());
 } (this, function() {
 
-  function set() {}    // 12 - 37 vm.$set
+  function set() {}    // 12 - 37 
 
   function del() {}
 
