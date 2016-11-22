@@ -3,7 +3,7 @@
   (global.Vue = factory());
 } (this, function() {
 
-  function set() {}    // 12 - 37 
+  function set() {}    // 12 - 37
 
   function del() {}
 
@@ -96,7 +96,7 @@
 
   function applyTransition() {}
 
-  function query() {}
+  function query() {}     // 1124 - 1133 如果 DOM 还未生成，那么给予提示。
 
   function inDoc() {}
 
@@ -178,12 +178,12 @@
 
   function resolveAsset() {}
 
-  function Dep() {}          // 1985 - 1961
+  function Dep() {}          // 1985 - 1961     A dep is an observable
   Dep.target
   Dep.prototype.addSub
   Dep.prototype.removeSub
   Dep.prototype.depend
-  Dep.prototype.notify       // 2000 - 2006
+  Dep.prototype.notify       // 2000 - 2006     Notify all subscribers of a new value.
 
   var arrayKeys = Object.getOwnPropertyNames();
 
@@ -192,7 +192,7 @@
   function Observer() {}  // 2108 -2119
   Observer.prototype.walk         // 2131 - 2136 object 对象中的 key-value 都走 convert() 即: setter getter
   Observer.prototype.observeArray
-  Observer.prototype.convert
+  Observer.prototype.convert(key, value)   // 2158 - 2160 走 defineReactive()
   Observer.prototype.addVm
   Observer.prototype.removeVm
 
@@ -202,7 +202,7 @@
 
   function observe() {}
 
-  function defineReactive() {}    // 2252 - 2298
+  function defineReactive() {}    // 2252 - 2298  定义一个动态属性的对象。 即: setter getter
 
   var util = Object.freeze({
     defineReactive: defineReactive,
@@ -277,7 +277,9 @@
     get warn () { return warn; }
   });
 
-  function initMixin() {}
+  function initMixin() {
+    Vue.prototype._init    // 2389 - 2475
+  }
 
   var pathCache = new Cache(1000);
 
@@ -632,7 +634,7 @@
 
   function isScript() {}
 
-  function transclude() {}
+  function transclude() {}    // 7636 - 7667 return {Element|DocumentFragment}
 
   function transcludeTemplate() {}
 
@@ -646,9 +648,13 @@
 
   var compiler = Object.freeze({})
 
-  function stateMixin() {}
+  function stateMixin() {
+    makeComputedGetter // 8026 - 8039
+  }
 
-  function eventsMixin() {}
+  function eventsMixin() {
+    Vue.prototype._callHook  // 8227 - 8236 触发所有处理程序一个钩子
+  }
 
   function noop$1() {}
 
@@ -689,7 +695,7 @@
     Vue.prototype.$on
     Vue.prototype.$once
     Vue.prototype.$off
-    Vue.prototype.$emit
+    Vue.prototype.$emit       // 9319 - 9346  return {Boolean} shouldPropagate(Propagate: 传播)
     Vue.prototype.$broadcast
     Vue.prototype.$dispatch
   }
@@ -702,15 +708,15 @@
   }
 
   function Vue() {}
-  Vue.prototype._initState
-  Vue.prototype._initProps
+  Vue.prototype._initState      // 组织实例的 scope, 包括: data, computed, methods, properties
+  Vue.prototype._initProps      //7868 - 7880
   Vue.prototype._initData
   Vue.prototype._setData
   Vue.prototype._proxy          // 7957 - 7975
   Vue.prototype._unproxy
-  Vue.prototype._digest         // 802 -806
+  Vue.prototype._digest         // 7993 - 7996
   Vue.prototype._initComputed
-  Vue.prototype._initMethods
+  Vue.prototype._initMethods    // 8047 - 8054  将 methods 中的方法添加到全局 vue（this）上
   Vue.prototype._initMeta
 
   var slot = {}

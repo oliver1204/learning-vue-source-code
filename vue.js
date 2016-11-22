@@ -257,8 +257,7 @@
      * @param {Object} to
      * @param {Object} from
 
-     Vue.extend()  创建一个组件构造器;
-     * 不知道和这个有什么关系，先暂时写在这里吧 ~
+      将 from 中的 属性添加到 to 中
      */
 
     function extend(to, from) {
@@ -759,9 +758,9 @@
 
     function parseDirective(s) {
       // var cache$1 = new Cache(1000);
-      var hit = cache$1.get(s);
+      var hit = cache$1.get(s);  // 缓存中是否存在 s
       if (hit) {
-        return hit;
+        return hit;             // 如果存在返回 返回对象
       }
 
       // reset parser state
@@ -2099,7 +2098,7 @@
     };
 
     var arrayProto = Array.prototype;
-    var arrayMethods = Object.create(arrayProto);
+    var arrayMethods = Object.create(arrayProto);    // 创建一个 array 对象
 
     /**
      * Intercept mutating methods and emit events
@@ -2109,7 +2108,7 @@
       // cache original method
       var original = arrayProto[method];
       def(arrayMethods, method, function mutator() {
-        // avoid leaking arguments:
+        // avoid leaking(遗漏)  arguments:
         // http://jsperf.com/closure-with-arguments
         var i = arguments.length;
         var args = new Array(i);
@@ -2339,7 +2338,7 @@
 
     /**
      * Define a reactive property on an Object.
-     *
+     *  定义一个活性属性的对象。
      * @param {Object} obj
      * @param {String} key
      * @param {*} val
@@ -2405,6 +2404,7 @@
           dep.notify();
         }
       });
+
     }
 
     var util = Object.freeze({
@@ -2482,19 +2482,31 @@
 
     var uid = 0;
 
+    // 内部构建安装
     function initMixin (Vue) {
       /**
-       * The main init sequence. This is called for every
-       * instance, including ones that are created from extended
+       * The main init sequence(序列). This is called for every
+       * instance(实例), including ones that are created from extended
        * constructors.
        *
        * @param {Object} options - this options object should be
        *                           the result of merging class
        *                           options and the options passed
-       *                           in to the constructor.
+       *                           in to the constructor(构造函数).
        */
 
       Vue.prototype._init = function (options) {
+        /*
+        options = {
+            computed: {},
+            data: {},
+            methods: {},
+            watch: {}
+          }
+
+          this -- > Vue.prototype
+        */
+
         options = options || {};
 
         this.$el = null;
@@ -2506,7 +2518,7 @@
         this._watchers = []; // all watchers as an array
         this._directives = []; // all directives
 
-        // a uid
+        // a uid  初始为 0
         this._uid = uid++;
 
         // a flag to avoid this being observed
@@ -2527,14 +2539,14 @@
         this._unlinkFn = null;
 
         // context:
-        // if this is a transcluded component, context
+        // if this is a transcluded component(组合组件), context
         // will be the common parent vm of this instance
         // and its host.
         this._context = options._context || this.$parent;
 
         // scope:
         // if this is inside an inline v-for, the scope
-        // will be the intermediate scope created for this
+        // will be the intermediate(起媒介作用) scope created for this
         // repeat fragment. this is used for linking props
         // and container directives.
         this._scope = options._scope;
@@ -2562,11 +2574,11 @@
         // set ref
         this._updateRef();
 
-        // initialize data as empty object.
+        // initialize(初始化) data as empty object.
         // it will be filled up in _initData().
         this._data = {};
 
-        // call init hook
+        // call init hook(钩子)
         this._callHook('init');
 
         // initialize data observation and scope inheritance.
@@ -3254,6 +3266,7 @@
     function Watcher(vm, expOrFn, cb, options) {
       // mix in options
       if (options) {
+        // options 中的方法添加到 this
         extend(this, options);
       }
       var isFn = typeof expOrFn === 'function';
@@ -7146,7 +7159,7 @@
 
       // only need to compile other attributes for
       // non-fragment instances
-      if (el.nodeType !== 11) {
+      if (el.nodeType !== 11) {          // 非fragment
         // for components, container and replacer need to be
         // compiled separately and linked in different scopes.
         if (options._asComponent) {
@@ -7743,7 +7756,7 @@
     var specialCharRE = /[^\w\-:\.]/;
 
     /**
-     * Process an element or a DocumentFragment based on a
+     * Process(加工) an element or a DocumentFragment based on a
      * instance option object. This allows us to transclude
      * a template node/fragment before the instance is created,
      * so the processed fragment can then be cloned and reused
@@ -7755,7 +7768,7 @@
      */
 
     function transclude(el, options) {
-      // extract container attributes to pass them down
+      // extract（提取） container attributes to pass them down
       // to compiler, because they need to be compiled in
       // parent scope. we are mutating the options object here
       // assuming the same object will be used for compile
@@ -8017,10 +8030,10 @@
         i = keys.length;
         while (i--) {
           key = keys[i];
-          // there are two scenarios where we can proxy a data key:
+          // there are two scenarios(情况) where we can proxy a data key:
           // 1. it's not already defined as a prop
-          // 2. it's provided via a instantiation option AND there are no
-          //    template prop present
+          // 2. it's provided via a instantiation option AND there are no template prop present
+          //   它是通过一个实例化的选择和没有提供模板支撑
           if (!props || !hasOwn(props, key)) {
             this._proxy(key);
           } else if ('development' !== 'production') {
@@ -8341,7 +8354,7 @@
 
       /**
        * Trigger all handlers for a hook
-       *
+       * 触发所有处理程序一个钩子
        * @param {String} hook
        */
 
@@ -8690,8 +8703,8 @@
         var options = this.$options;
 
         // transclude and init element
-        // transclude can potentially replace original
-        // so we need to keep reference; this step also injects
+        // transclude can potentially(可能) replace original
+        // so we need to keep reference(参考); this step also injects
         // the template and caches the original attributes
         // on the container node and replacer node.
         var original = el;
@@ -8699,6 +8712,7 @@
         this._initElement(el);
 
         // handle v-pre on root node (#2026)
+        // v-pre  跳过编译这个元素和它的子元素。跳过大量没有指令的节点会加快编译。
         if (el.nodeType === 1 && getAttr(el, 'v-pre') !== null) {
           return;
         }
@@ -9061,7 +9075,7 @@
         var vm = this;
         var parsed;
         if (typeof expOrFn === 'string') {
-          parsed = parseDirective(expOrFn);
+          parsed = parseDirective(expOrFn);     // 先判断表达式是否已经在内存中，如果在则返回，不在则放入内存中 并返回表达式名称
           expOrFn = parsed.expression;
         }
         var watcher = new Watcher(vm, expOrFn, cb, {
@@ -9434,7 +9448,7 @@
        * Trigger an event on self.
        *
        * @param {String|Object} event
-       * @return {Boolean} shouldPropagate
+       * @return {Boolean} shouldPropagate(Propagate: 传播)
        */
 
       Vue.prototype.$emit = function (event) {
@@ -9543,7 +9557,7 @@
 
     function lifecycleAPI (Vue) {
       /**
-       * Set instance target element and kick off the compilation
+       * Set instance(实例) target element and kick off the compilation
        * process. The passed in `el` can be a selector string, an
        * existing Element, or a DocumentFragment (for block
        * instances).
