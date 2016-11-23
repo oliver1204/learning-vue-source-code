@@ -1857,7 +1857,7 @@
     /**
      * Make sure component options get converted to actual
      * constructors.
-     *
+     * 确保组件的选择转化为实际的构造函数。
      * @param {Object} options
      */
 
@@ -1959,22 +1959,17 @@
      *                     an instantiation merge.
      */
 
-     /*
-      * 首次加载,初始化时 parent -> this.constructor.options
-      * = { directives, elementDirectives, filters, transitions, replace, partials, components }
-     */
-
     function mergeOptions(parent, child, vm) {
-      guardComponents(child);
-      guardProps(child);
+      guardComponents(child);    // 确保组件的选择转化为实际的构造函数。返回结果: child
+      guardProps(child);  // 确保是否是从prop中获取的。返回结果: child
       if ('development' !== 'production') {
         if (child.propsData && !vm) {
           warn('propsData can only be used as an instantiation option.');
         }
       }
-      var options = {};    // 新的 option 对象
+      var options = {};    // merge 后 option 对象
       var key;
-      if (child['extends']) {
+      if (child['extends']) {    // extends 和 mixins 类似，区别在于，组件的选项会比源组件被扩展有更高的优先级。
         parent = typeof child['extends'] === 'function' ? mergeOptions(parent, child['extends'].options, vm) : mergeOptions(parent, child['extends'], vm);
       }
       if (child.mixins) {
@@ -2539,7 +2534,7 @@
         this._unlinkFn = null;
 
         // context:
-        // if this is a transcluded component(组合组件), context
+        // if this is a transcluded component, context
         // will be the common parent vm of this instance
         // and its host.
         this._context = options._context || this.$parent;
@@ -2566,7 +2561,7 @@
         }
 
         // merge options.
-        // 初始 options 的内容:
+        // 初始 options 的内容(installGlobalAPI -> Vue.options 中定义):
         // this.constructor.options = { directives, elementDirectives, filters, transitions, replace, partials, components }
         // 将 两个 option 合并成一个 options
         options = this.$options = mergeOptions(this.constructor.options, options, this);
@@ -10011,10 +10006,9 @@
       /**
        * Vue and every constructor that extends Vue has an
        * associated options object, which can be accessed during
-       * compilation steps as `this.constructor.options`.
-       *
-       * These can be seen as the default options of every
-       * Vue instance.
+       * compilation steps as `  this.constructor.options   `.
+       *  Vue 和 每一个 Vue 的扩展方法都有一个与之相关联的在编译阶段起作用的 options 对象，
+       * These can be seen as the ！default options of everyVue instance.
        */
 
       Vue.options = {
