@@ -1,77 +1,68 @@
-var hasBrokenTemplate = (function(){})()   // boolean   Test for the presence of the Safari template cloning bug
-var hasTextareaCloneBug = (function(){})()   // boolean Test for IE10/11 textarea placeholder clone bug
-var arrayProto = Array.prototype
-var arrayMethods = Object.create(arrayProto)  // 创建一个 array 对象,此对象包含所有 prototype 中的方法
-var util = Object.freeze({
-  defineReactive: defineReactive,
-  set: set,
-  del: del,
-  hasOwn: hasOwn,
-  isLiteral: isLiteral,
-  isReserved: isReserved,
-  _toString: _toString,
-  toNumber: toNumber,
-  toBoolean: toBoolean,
-  stripQuotes: stripQuotes,
-  camelize: camelize,
-  hyphenate: hyphenate,
-  classify: classify,
-  bind: bind,
-  toArray: toArray,
-  extend: extend,
-  isObject: isObject,
-  isPlainObject: isPlainObject,
-  def: def,
-  debounce: _debounce,
-  indexOf: indexOf,
-  cancellable: cancellable,
-  looseEqual: looseEqual,
-  isArray: isArray,
-  hasProto: hasProto,
-  inBrowser: inBrowser,
-  devtools: devtools,
-  isIE: isIE,
-  isIE9: isIE9,
-  isAndroid: isAndroid,
-  isIos: isIos,
-  iosVersionMatch: iosVersionMatch,
-  iosVersion: iosVersion,
-  hasMutationObserverBug: hasMutationObserverBug,
-  get transitionProp () { return transitionProp; },
-  get transitionEndEvent () { return transitionEndEvent; },
-  get animationProp () { return animationProp; },
-  get animationEndEvent () { return animationEndEvent; },
-  nextTick: nextTick,
-  get _Set () { return _Set; },
-  query: query,
-  inDoc: inDoc,
-  getAttr: getAttr,
-  getBindAttr: getBindAttr,
-  hasBindAttr: hasBindAttr,
-  before: before,
-  after: after,
-  remove: remove,
-  prepend: prepend,
-  replace: replace,
-  on: on,
-  off: off,
-  setClass: setClass,
-  addClass: addClass,
-  removeClass: removeClass,
-  extractContent: extractContent,
-  trimNode: trimNode,
-  isTemplate: isTemplate,
-  createAnchor: createAnchor,
-  findRef: findRef,
-  mapNodeRange: mapNodeRange,
-  removeNodeRange: removeNodeRange,
-  isFragment: isFragment,
-  getOuterHTML: getOuterHTML,
-  mergeOptions: mergeOptions,
-  resolveAsset: resolveAsset,
-  checkComponentAttr: checkComponentAttr,
-  commonTagRE: commonTagRE,
-  reservedTagRE: reservedTagRE,
-  get warn () { return warn; }
-});
-var uid = 0;
+Vue.prototype._init = (options) => {
+  this.$el = null;
+  this.$parent = options.parent;
+  this.$root = this.$parent ? this.$parent.$root : this;  // this: Vue
+  this.$children = [];
+  this.$refs = {};
+  this.$els = {};
+  this._watchers = []; // all watchers as an array
+  this._directives = []; // all directives
+  this._uid = uid++;
+  this._isVue = true;
+  this._events = {}; // registered callbacks
+  this._eventsCount = {}; // for $broadcast optimization
+  this._isFragment = false;
+  this._fragment = // @type {DocumentFragment}
+  this._fragmentStart = // @type {Text|Comment}
+  this._fragmentEnd = null; // @type {Text|Comment}
+  this._isCompiled = this._isDestroyed = this._isReady = this._isAttached = this._isBeingDestroyed = this._vForRemoving = false;
+  this._unlinkFn = null;
+
+  this._context = options._context || this.$parent;
+  this._scope = options._scope;
+  this._frag = options._frag;
+
+  if (this._frag) {
+    this._frag.children.push(this);
+  }
+
+  // push self into parent / transclusion host
+  if (this.$parent) {
+    this.$parent.$children.push(this);
+  }
+
+  options = this.$options = mergeOptions(this.constructor.options, options, this);
+  this._updateRef();
+  this._data = {};
+  this._callHook('init');
+  this._initState = () => {
+    this._initProps = () => {
+      compileAndLinkProps()
+    }
+    this._initMeta = () => {
+      defineReactive
+    }
+    this._initMethods();
+    this._initData = () => {
+      this._proxy(key);
+      observe(data, this);
+    } ;
+    this._initComputed = () => {
+      var def = {
+        enumerable: true,
+        configurable: true
+      };
+      if ('function') {
+        def.get = makeComputedGetter();
+        def.set = noop;
+      } else {
+        
+      }
+    };
+  };
+  this._initEvents();
+  this._callHook('created');
+  if (options.el) {
+    this.$mount(options.el);
+  }
+}
