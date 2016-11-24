@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>无标题文档</title>
-<script src="./vue.js"></script>
+<script src="./vue2.0.js"></script>
 <style scope>
    * {
      font-size: 48px;
@@ -12,17 +12,26 @@
 </head>
 
 <body>
-  <div id="example">{{msg}}</div>
-  <button @click="updateMessage">click me</button>
+  <!-- <div>{{msg}}</div> -->
+  <!-- <button @click="updateMessage">click me</button> -->
 
-  <div>{{messages}}</div>
+  <!-- <div>{{messages}}</div> -->
 
-  <div>{{computedTest}}</div>
+  <!-- <div>{{computedTest}}</div>
 
   <div>{{watchomputedTest}}</div>
 
-  <div>{{setText}}</div>
+  <div>{{setText}}</div> -->
 
+  <div id="app">
+    {{ message }}
+  </div>
+
+  <h1>
+    <a name="hello-world" href="#hello-world">
+      Hello world!
+    </a>
+  </h1>
 
   <script>
 
@@ -39,42 +48,50 @@
     //   data: () =>({Bus})
     // })
 
-    new Vue({
-      el: 'body',
+    // messages: 'test',
+    // watchTest: '',
+    // a: 1,
+    // b: 2
 
-      data: () => {
-        return {
-          msg: 'not updated',
-          messages: 'test',
-          watchTest: '',
-          a: 1,
-          b: 2
-        };
-      },
 
-      methods: {
-        updateMessage () {
-          this.msg = 'updated'
-          this.$nextTick(function () {
-            this.$set('setText', 2)
-            this.msg = 'updated again'
-          })
-        }
-      },
+    // methods: {
+    //   updateMessage () {
+    //     this.msg = 'updated'
+    //     this.$nextTick(function () {
+    //       this.$set('setText', 2)
+    //       this.msg = 'updated again'
+    //     })
+    //   }
+    // },
+    //
+    // computed: {
+    //   computedTest() {
+    //     return 'computedTest';
+    //   }
+    // },
+    //
+    // watch: {
+    //   computedTest: () => {
+    //     return this.watchTest = 'watchTest';
+    //   }
+    // }
 
-      computed: {
-        computedTest() {
-          return 'computedTest';
-        }
-      },
+    // new Vue({
+    //   el: 'body',
+    //
+    //   data:  {
+    //     msg: 'not updated'
+    //   }
+    // });
 
-      watch: {
-        computedTest: () => {
-          return this.watchTest = 'watchTest';
-        }
+
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
       }
-
-    });
+    })
 
   </script>
 </body>
