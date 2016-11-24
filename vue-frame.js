@@ -164,17 +164,17 @@
   strats.watch
   strats.props
 
-  function mergeAssets() {}
+  function mergeAssets() {} // 1728 - 1731
 
   function defaultStrat() {}
 
-  function guardComponents() {}
+  function guardComponents() {} // 确保组件的选择转化为实际的构造函数。
 
-  function guardProps() {}
+  function guardProps() {}    // 确保是否是从prop中获取的。
 
   function guardArrayAssets() {}
 
-  function mergeOptions() {}
+  function mergeOptions() {}  // 1885 - 1918 方法用于 实例化 和 继承
 
   function resolveAsset() {}
 
