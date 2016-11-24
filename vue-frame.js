@@ -278,7 +278,7 @@
   });
 
   function initMixin() {
-    Vue.prototype._init    // 2389 - 2475
+    Vue.prototype._init // 2389 - 2475
   }
 
   var pathCache = new Cache(1000);
@@ -707,7 +707,9 @@
     Vue.prototype.$compile
   }
 
-  function Vue() {}
+  function Vue(options) {
+    this._init(options);
+  }
   Vue.prototype._initState      // 组织实例的 scope, 包括: data, computed, methods, properties
   Vue.prototype._initProps      //7868 - 7880
   Vue.prototype._initData

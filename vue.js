@@ -101,7 +101,7 @@
 
     /**
      * Check if a string starts with $ or _
-     *
+     * 保留字段
      * @param {String} str
      * @return {Boolean}
      */
@@ -225,10 +225,8 @@
      */
 
     function bind(fn, ctx) {
-      // a???????
       return function (a) {
         var l = arguments.length;
-        //  l 不存在  fn.call(ctx)   ？？？？？？？？？
         return l ? l > 1 ? fn.apply(ctx, arguments) : fn.call(ctx, a) : fn.call(ctx);
       };
     }
@@ -256,7 +254,6 @@
      *
      * @param {Object} to
      * @param {Object} from
-
       将 from 中的 属性添加到 to 中
      */
 
@@ -335,7 +332,6 @@
      * @param {Number} wait
      * @return {Function} - the debounced function
      */
-    // ???????  不知道作用
     function _debounce(func, wait) {
       var timeout, args, context, timestamp, result;
       var later = function later() {
@@ -841,10 +837,10 @@
     }
 
     function compileRegex() {
-      var open = escapeRegex(config.delimiters[0]);
-      var close = escapeRegex(config.delimiters[1]);
-      var unsafeOpen = escapeRegex(config.unsafeDelimiters[0]);
-      var unsafeClose = escapeRegex(config.unsafeDelimiters[1]);
+      var open = escapeRegex(config.delimiters[0]);   // {{
+      var close = escapeRegex(config.delimiters[1]);  // }}
+      var unsafeOpen = escapeRegex(config.unsafeDelimiters[0]); // {{{
+      var unsafeClose = escapeRegex(config.unsafeDelimiters[1]); // }}}
       tagRE = new RegExp(unsafeOpen + '((?:.|\\n)+?)' + unsafeClose + '|' + open + '((?:.|\\n)+?)' + close, 'g');
       htmlRE = new RegExp('^' + unsafeOpen + '((?:.|\\n)+?)' + unsafeClose + '$');
       // reset cache
@@ -1708,11 +1704,17 @@
      * @param {*} childVal
      * @param {Vue} [vm]
      */
+    // config 是一个全局对象，对应于Vue.config
+    // config.optionMergeStrategies 初始化时是一个空对象
 
     var strats = config.optionMergeStrategies = Object.create(null);
 
     /**
      * Helper that recursively merges two data objects together.
+     * 合并规则：
+     * 1. 如果from中的某个属性to中有，保留to中的，什么都不做。
+     * 2. 如果to中没有，赋值。
+     * 3. 如果to中和from中的某个属性值都是对象，递归调用。
      */
 
     function mergeData(to, from) {
@@ -1721,9 +1723,9 @@
         toVal = to[key];
         fromVal = from[key];
         if (!hasOwn(to, key)) {
-          set(to, key, fromVal);
+          set(to, key, fromVal); // 设置to[key] = fromVal
         } else if (isObject(toVal) && isObject(fromVal)) {
-          mergeData(toVal, fromVal);
+          mergeData(toVal, fromVal);  // 如果对应的值都是对象，则递归合并。
         }
       }
       return to;
@@ -1732,14 +1734,15 @@
     /**
      * Data
      */
-
+    // data 是个重头戏，也是整个合并策略中最复杂的，这是因为，在组件中data是以函数的形式存在的。
+    // 如果传入了vm，那么它表示的是组件的根实例
     strats.data = function (parentVal, childVal, vm) {
       if (!vm) {
         // in a Vue.extend merge, both should be functions
         if (!childVal) {
           return parentVal;
         }
-        if (typeof childVal !== 'function') {
+        if (typeof childVal !== 'function') { // 在组件中定义data 必须是一个函数
           'development' !== 'production' && warn('The "data" option should be a function ' + 'that returns a per-instance value in component ' + 'definitions.', vm);
           return parentVal;
         }
@@ -1751,10 +1754,11 @@
         // merged result of both functions... no need to
         // check if parentVal is a function here because
         // it has to be a function to pass previous merges.
+        // 这里返回的应该是一个函数，函数返回结果是合并后的data对象
         return function mergedDataFn() {
           return mergeData(childVal.call(this), parentVal.call(this));
         };
-      } else if (parentVal || childVal) {
+      } else if (parentVal || childVal) { // 如果提供了vm实例
         return function mergedInstanceDataFn() {
           // instance merge
           var instanceData = typeof childVal === 'function' ? childVal.call(vm) : childVal;
@@ -1791,15 +1795,16 @@
     };
 
     /**
-     * Assets
+     * Assets  (components,directives,filters)
      *
      * When a vm is present (instance creation实例), we need to do
      * a three-way merge between constructor options, instance
      * options and parent options.
      */
-
+    // 对于 assets 也就是 components, directives, filters 合并的策略就是返回一个合并后的新对象，
+    // 新对象的自有属性全部来自 childVal, 但是通过原型链委托在了 parentVal 上。
     function mergeAssets(parentVal, childVal) {
-      var res = Object.create(parentVal || null);
+      var res = Object.create(parentVal || null);   // 原型委托
       return childVal ? extend(res, guardArrayAssets(childVal)) : res;
     }
     // transitions, components, directives, elementDirectives, filters, partials
@@ -1810,11 +1815,12 @@
 
     /**
      * Events & Watchers.
-     *
+     * 即: options.watch options.events
      * Events & watchers hashes should not overwrite one
      * another, so we merge them as arrays.
      */
-
+     // 不应该重写（覆盖）,应该保存在一个数组里
+     // 子组件和父组件的watchers不应该覆盖，而是应该把它们都合并在一个数组里。这里同样是父组件的在前，子组件的在后。
     strats.watch = strats.events = function (parentVal, childVal) {
       if (!childVal) return parentVal;
       if (!parentVal) return childVal;
@@ -1826,6 +1832,7 @@
         if (parent && !isArray(parent)) {
           parent = [parent];
         }
+        // parent在前，child在后,如果在父组件中不存在，以数组的形式存储子组件的watcher
         ret[key] = parent ? parent.concat(child) : [child];
       }
       return ret;
@@ -1833,6 +1840,7 @@
 
     /**
      * Other object hashes.
+     * 即：options.props options.methods options.computed
      */
 
     strats.props = strats.methods = strats.computed = function (parentVal, childVal) {
@@ -1840,7 +1848,7 @@
       if (!parentVal) return childVal;
       var ret = Object.create(null);
       extend(ret, parentVal);
-      extend(ret, childVal);
+      extend(ret, childVal);    //  child的会覆盖parent的
       return ret;
     };
 
@@ -2043,7 +2051,7 @@
      */
     function Dep() {
       this.id = uid$1++;
-      this.subs = []; // 监听者的集合
+      this.subs = []; // 保存着订阅者（ 即watcher ）的数组
     }
 
     // the current target watcher being evaluated.
@@ -2196,7 +2204,7 @@
 
     function Observer(value) {
       this.value = value;
-      this.dep = new Dep();
+      this.dep = new Dep();  // 收集依赖
       def(value, '__ob__', this);
 
       if (isArray(value)) {
@@ -2204,7 +2212,7 @@
         augment(value, arrayMethods, arrayKeys);
         this.observeArray(value);
       } else {
-        this.walk(value);
+        this.walk(value);  // 数据的每一个属性将属性变成reactive的(Observer.protoype.convert())
       }
     }
 
@@ -2314,6 +2322,13 @@
      * @return {Observer|undefined}
      * @static
      */
+    // 在observe()函数中还做了些能否new observer() 的条件判断，这些条件有：
+    //
+    // 没有被observe过（observe过的对象都会被添加__ob__属性）
+    // 只能是plain object（toString.call(ob) === "[object Object]"）或者数组
+    // 不能是Vue实例（obj._isVue !== true）
+    // object是extensible的（Object.isExtensible(obj) === true）
+
 
     function observe(value, vm) {
       if (!value || typeof value !== 'object') {
@@ -2343,7 +2358,7 @@
       /*
         data :  返回的值为 obj
       */
-      var dep = new Dep();
+      var dep = new Dep();  // 这里是收集依赖
 
       // Object.getOwnPropertyDescriptor 返回指定对象上一个自有属性对应的属性描述符。
       var property = Object.getOwnPropertyDescriptor(obj, key);
@@ -2396,7 +2411,9 @@
             val = newVal;
           }
           childOb = observe(newVal);
-          dep.notify();
+          dep.notify();     // 这里是notify观察这个数据的依赖（watcher）
+          // 这里的subs是保存着订阅者（即watcher）的数组，当被观察数据发生变化时，
+          // 即被调用setter，那么dep.notify()就循环这里的订阅者，分别调用他们的update方法。
         }
       });
 
@@ -3243,7 +3260,8 @@
      * A watcher parses an expression, collects dependencies,
      * and fires callback when the expression value changes.
      * This is used for both the $watch() api and directives.
-     *
+     * 每个与数据绑定的directive都有一个watcher，帮它监听表达式的值，如果发生变化，
+     * 则通知它update自己负责的DOM。一直说的dependency collection就在这里发生。
      * @param {Vue} vm
      * @param {String|Function} expOrFn
      * @param {Function} cb
@@ -3297,7 +3315,7 @@
      */
 
     Watcher.prototype.get = function () {
-      this.beforeGet();
+      this.beforeGet();         // -> Dep.target = this
       var scope = this.scope || this.vm;
       var value;
       try {
@@ -3321,7 +3339,7 @@
       if (this.postProcess) {
         value = this.postProcess(value);
       }
-      this.afterGet();
+      this.afterGet();   // -> Dep.target = null
       return value;
     };
 
@@ -7985,6 +8003,9 @@
         this._initProps();
         this._initMeta();
         this._initMethods();
+        // _initData()发生在_initState()中，主要做了两件事：
+        // 1. 代理data中的属性
+        // 2. observe data
         this._initData();
         this._initComputed();
       };
@@ -8029,13 +8050,14 @@
           // 1. it's not already defined as a prop
           // 2. it's provided via a instantiation option AND there are no template prop present
           //   它是通过一个实例化的选择和没有提供模板支撑
+          // 代理（proxy）data中的属性到_data，使得 data 返回的数据依次挂在 this 上
           if (!props || !hasOwn(props, key)) {
             this._proxy(key);
           } else if ('development' !== 'production') {
             warn('Data field "' + key + '" is already defined ' + 'as a prop. To provide default value for a prop, use the "default" ' + 'prop option; if you want to pass prop values to an instantiation ' + 'call, use the "propsData" option.', this);
           }
         }
-        // observe data  经过此步骤以后，data -> 存在getter setter
+        // observe data 创建 new Observer()  经过此步骤以后，data -> 存在getter setter
         observe(data, this);
       };
 
@@ -8738,7 +8760,7 @@
         var contentUnlinkFn = contentLinkFn ? contentLinkFn(this, el) : compile(el, options)(this, el);
 
         // register composite unlink function
-        // to be called during instance destruction
+        // to be called during instance destruction unlinkFn是在vm销毁的时候用的
         this._unlinkFn = function () {
           rootUnlinkFn();
           // passing destroying: true to avoid searching and

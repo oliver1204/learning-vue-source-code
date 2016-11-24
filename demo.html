@@ -12,16 +12,16 @@
 </head>
 
 <body>
-  <div id="example">{{msg}}</div>
-  <button @click="updateMessage">click me</button>
+  <div>{{msg}}</div>
+  <!-- <button @click="updateMessage">click me</button> -->
 
-  <div>{{messages}}</div>
+  <!-- <div>{{messages}}</div> -->
 
-  <div>{{computedTest}}</div>
+  <!-- <div>{{computedTest}}</div>
 
   <div>{{watchomputedTest}}</div>
 
-  <div>{{setText}}</div>
+  <div>{{setText}}</div> -->
 
 
   <script>
@@ -39,41 +39,42 @@
     //   data: () =>({Bus})
     // })
 
+    // messages: 'test',
+    // watchTest: '',
+    // a: 1,
+    // b: 2
+
+
+    // methods: {
+    //   updateMessage () {
+    //     this.msg = 'updated'
+    //     this.$nextTick(function () {
+    //       this.$set('setText', 2)
+    //       this.msg = 'updated again'
+    //     })
+    //   }
+    // },
+    //
+    // computed: {
+    //   computedTest() {
+    //     return 'computedTest';
+    //   }
+    // },
+    //
+    // watch: {
+    //   computedTest: () => {
+    //     return this.watchTest = 'watchTest';
+    //   }
+    // }
+
     new Vue({
       el: 'body',
 
       data: () => {
         return {
-          msg: 'not updated',
-          messages: 'test',
-          watchTest: '',
-          a: 1,
-          b: 2
+          msg: 'not updated'
         };
-      },
-
-      methods: {
-        updateMessage () {
-          this.msg = 'updated'
-          this.$nextTick(function () {
-            this.$set('setText', 2)
-            this.msg = 'updated again'
-          })
-        }
-      },
-
-      computed: {
-        computedTest() {
-          return 'computedTest';
-        }
-      },
-
-      watch: {
-        computedTest: () => {
-          return this.watchTest = 'watchTest';
-        }
       }
-
     });
 
   </script>
