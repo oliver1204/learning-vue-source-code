@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>无标题文档</title>
-<script src="./vue.js"></script>
+<script src="./vue2.0.js"></script>
 <style scope>
    * {
      font-size: 48px;
@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <div>{{msg}}</div>
+  <!-- <div>{{msg}}</div> -->
   <!-- <button @click="updateMessage">click me</button> -->
 
   <!-- <div>{{messages}}</div> -->
@@ -23,6 +23,15 @@
 
   <div>{{setText}}</div> -->
 
+  <div id="app">
+    {{ message }}
+  </div>
+
+  <h1>
+    <a name="hello-world" href="#hello-world">
+      Hello world!
+    </a>
+  </h1>
 
   <script>
 
@@ -67,15 +76,20 @@
     //   }
     // }
 
-    new Vue({
-      el: 'body',
+    // new Vue({
+    //   el: 'body',
+    //
+    //   data:  {
+    //     msg: 'not updated'
+    //   }
+    // });
 
-      data: () => {
-        return {
-          msg: 'not updated'
-        };
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
       }
-    });
+    })
 
   </script>
 </body>
