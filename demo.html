@@ -8,20 +8,28 @@
    * {
      font-size: 48px;
    }
+   .btn {
+     font-size:20px;
+     background: rebeccapurple;
+     color: #fff;
+     border: 0;
+     padding: 10px 20px;
+     border-radius: 3px;
+   }
 </style>
 </head>
 
 <body>
   <div>{{msg}}</div>
-  <!-- <button @click="updateMessage">click me</button> -->
+  <button @click="updateMessage">click me</button>
 
-  <!-- <div>{{messages}}</div> -->
+ <div>{{messages}}</div>
 
-  <!-- <div>{{computedTest}}</div>
+ <div>{{computedTest}}</div>
 
   <div>{{watchomputedTest}}</div>
 
-  <div>{{setText}}</div> -->
+  <div>{{setText}}</div>
 
 
   <script>
@@ -32,51 +40,36 @@
     //     this.el.src = baseSrc
     //   },
     // })
-
-    // var Bus = Object.freeze(new Vue())
-    //
-    // Vue.mixin({
-    //   data: () =>({Bus})
-    // })
-
-    // messages: 'test',
-    // watchTest: '',
-    // a: 1,
-    // b: 2
-
-
-    // methods: {
-    //   updateMessage () {
-    //     this.msg = 'updated'
-    //     this.$nextTick(function () {
-    //       this.$set('setText', 2)
-    //       this.msg = 'updated again'
-    //     })
-    //   }
-    // },
-    //
-    // computed: {
-    //   computedTest() {
-    //     return 'computedTest';
-    //   }
-    // },
-    //
-    // watch: {
-    //   computedTest: () => {
-    //     return this.watchTest = 'watchTest';
-    //   }
-    // }
-
     new Vue({
       el: 'body',
 
-      data: () => {
-        return {
-          msg: 'not updated'
-        };
-      }
-    });
+      data:  {
+        msg: 'not updated'
+      },
 
+      methods: {
+        updateMessage() {
+          this.msg = 'updated'
+          this.$nextTick(function () {
+            this.$set('setText', 2)
+            this.msg = 'updated again'
+          })
+        }
+      },
+
+      computed: {
+        computedTest() {
+          return 'computedTest';
+        }
+      },
+
+      watch: {
+        computedTest: () => {
+          return this.watchTest = 'watchTest';
+        }
+      }
+
+    });
   </script>
 </body>
 </html>

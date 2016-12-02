@@ -56,7 +56,7 @@ Vue.prototype._init = (options) => {
         def.get = makeComputedGetter();
         def.set = noop;
       } else {
-        
+
       }
     };
   };

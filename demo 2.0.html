@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>无标题文档</title>
+<script src="./vue2.0.js"></script>
+<style scope>
+   * {
+     font-size: 48px;
+   }
+   .btn {
+     font-size:20px;
+     background: rebeccapurple;
+     color: #fff;
+     border: 0;
+     padding: 10px 20px;
+     border-radius: 3px;
+   }
+</style>
+</head>
+
+<body>
+  <div id="app">
+    <div>{{ message }}</div>
+    <button class="btn" v-bind:disabled="someDynamicCondition">
+      Button
+    </button>
+  </div>
+
+  <h1>
+    <a name="hello-world" href="#hello-world">
+      Hello world!
+    </a>
+  </h1>
+
+  <script>
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!',
+        someDynamicCondition: true
+      }
+    })
+
+  </script>
+</body>
+</html>
